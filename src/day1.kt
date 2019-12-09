@@ -1,6 +1,6 @@
 import kotlin.math.floor
 
-private val startList = listOf(
+private val starsList = listOf(
     108546,
     76196,
     144412,
@@ -107,4 +107,29 @@ fun calculateFuelCost(mass: Int): Int {
     val fuelCost = (floor(mass.toFloat() / 3) - 2).toInt()
 
     return if (fuelCost < 0) 0 else fuelCost
+}
+
+fun calculateFuelWeightCost(fuel: Int) = calculateFuelCost(fuel)
+
+fun calculateNavCost(module: Int): Int {
+    val fuelCost = calculateFuelCost(module)
+    var totalFuelWeightCost = 0
+    var fuelToWeigh = fuelCost
+
+    while(fuelToWeigh > 0){
+        fuelToWeigh = calculateFuelWeightCost(fuelToWeigh)
+        totalFuelWeightCost += fuelToWeigh
+    }
+
+    return fuelCost + totalFuelWeightCost
+}
+
+fun calculateTotalNavCost(): Int {
+    var totalFuelCost = 0
+
+    starsList.forEach {
+        totalFuelCost += calculateNavCost(it)
+    }
+
+    return totalFuelCost
 }
