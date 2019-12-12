@@ -1,23 +1,22 @@
 package test
 
+import Line
 import Point
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
 
 class Day3Test {
-    private val origin = Point()
+    private val origin = Point.origin
     @TestFactory
     fun testPointMovement() = listOf(
-        "U2" to Point(y = 3),
-        "D3" to Point(y = -2),
-        "L1" to Point(0),
-        "R5" to Point(6)
+        "U2" to Point(y = Point.origin.y + 2),
+        "D3" to Point(y = Point.origin.y - 3),
+        "L1" to Point(Point.origin.x - 1),
+        "R5" to Point(Point.origin.x + 5)
     ).map { (input, expected) ->
         DynamicTest.dynamicTest("$expected is where the point should end up with instruction $input from $origin") {
-            Point().apply {
-                move(input)
-            } shouldBe expected
+            Point().move(input).end shouldBe expected
         }
     }
 
@@ -27,9 +26,7 @@ class Day3Test {
         listOf("U7", "R6", "D4", "L4") to Point(3, 4)
     ).map { (input, expected) ->
         DynamicTest.dynamicTest("$expected is where the point should end up with instruction $input from $origin") {
-            Point().apply {
-                moveOnPath(input)
-            } shouldBe expected
+            Point().moveOnPath(input).last().end shouldBe expected
         }
     }
 
@@ -60,15 +57,11 @@ class Day3Test {
             listOf("U98", "R91", "D20", "R16", "D67", "R40", "U7", "R15", "U6", "R7")
         ) to 135
     ).map { (input, expected) ->
-        DynamicTest.dynamicTest("$expected is closest distance to the origin $origin") {
-            val points = mutableListOf<Point>()
-            input.forEach {
-                points.add(Point().apply {
-                    moveOnPath(it)
-                })
-            }
+        DynamicTest.dynamicTest("$expected is closest distance for $input") {
+            val wire1 = Point().moveOnPath(input[0]).also { println("$it") }
+            val wire2 = Point().moveOnPath(input[1]).also { println("$it") }
 
-            points[0].closestCrossDistanceToOrigin(origin, points[1]) shouldBe expected
+            Line.findClosestCrossPoint(wire1, wire2).distanceFromOrigin shouldBe expected
         }
     }
 
@@ -83,13 +76,9 @@ class Day3Test {
             )
         )
 
-        val points = mutableListOf<Point>()
-        input.forEach {
-            points.add(Point().apply {
-                moveOnPath(it)
-            })
-        }
+        val wire1 = Point().moveOnPath(input[0]).also { println("$it") }
+        val wire2 = Point().moveOnPath(input[1]).also { println("$it") }
 
-        points[0].closestCrossDistanceToOrigin(origin, points[1]).also { println(it) } shouldNotBe -1
+        Line.findClosestCrossPoint(wire1, wire2).distanceFromOrigin.also { println(it) } shouldNotBe -1
     }
 }
