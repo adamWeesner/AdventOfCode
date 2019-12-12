@@ -20,19 +20,19 @@ data class Point(val x: Int = origin.x, val y: Int = origin.y) {
         return Line(this, newPoint)
     }
 
-    fun moveOnPath(instructions: List<String>): List<Line> {
-        val path = mutableListOf<Line>()
+    fun moveOnPath(instructions: List<String>): Path {
+        val path = Path()
         var startingPoint = this.copy()
         instructions.forEach {
             val newLine = startingPoint.move(it)
-            path.add(newLine)
+            path.segments.add(newLine)
             startingPoint = newLine.end
         }
         return path
     }
 
     companion object {
-        val origin = Point(1, 1)
+        val origin = Point(0, 0)
     }
 }
 
@@ -66,21 +66,21 @@ data class Line(val start: Point, val end: Point) {
             }
         }
     }
+}
 
-    companion object {
-        fun findClosestCrossPoint(wire1: List<Line>, wire2: List<Line>): Point {
-            var closestPoint = origin
-            for (i in 0..wire1.lastIndex) {
-                for (j in 0..wire2.lastIndex) {
-                    wire1[i].compare(wire2[j], closestPoint.distanceFromOrigin)
+data class Path(var segments: MutableList<Line> = mutableListOf()) {
+    fun findClosestCrossPoint(wire2: Path): Point {
+        var closestPoint = origin
+        for (i in 0..segments.lastIndex) {
+            for (j in 0..wire2.segments.lastIndex) {
+                segments[i].compare(wire2.segments[j], closestPoint.distanceFromOrigin)
 
-                    val crossLocation = wire1[i].crossLocation
-                    if (crossLocation != origin && crossLocation.distanceFromOrigin < closestPoint.distanceFromOrigin)
-                        closestPoint = crossLocation
-                }
+                val crossLocation = segments[i].crossLocation
+                if (crossLocation != origin && crossLocation.distanceFromOrigin < closestPoint.distanceFromOrigin)
+                    closestPoint = crossLocation
             }
-
-            return closestPoint
         }
+
+        return closestPoint
     }
 }
